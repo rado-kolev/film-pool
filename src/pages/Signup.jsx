@@ -5,18 +5,39 @@ import { UserAuth } from '../context/AuthContext';
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
   const { signUp } = UserAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
 
     try {
       await signUp(email, password);
       navigate('/');
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      setError(e.message);
+      console.log(e.message);
     }
+  };
+
+  // Handle changes in the input fields
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setError(''); // Clear the error message
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+    setError(''); // Clear the error message
   };
 
   return (
@@ -32,6 +53,7 @@ const Signup = () => {
           <div className='max-w-[450px] h-[600px] mx-auto bg-black/75 text-white'>
             <div className='max-w-[320px] mx-auto py-16'>
               <h1 className='text-3xl font-bold'>Sign Up</h1>
+              {error ? <p className='bg-red-500/70 p-3 my-2'>{error}</p> : null}
               <form
                 onSubmit={handleSubmit}
                 className='flex flex-col w-full py-4'
@@ -44,27 +66,41 @@ const Signup = () => {
                   autoComplete='email'
                 />
                 <input
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
+                  value={password}
                   className='p-3 my-2 bg-gray-700 rounded-lg'
                   type='password'
                   placeholder='Password'
                   autoComplete='current-password'
                 />
-                <button className='py-3 my-6 font-bold rounded-lg bg-red-600/80'>
+                <input
+                  onChange={handleConfirmPasswordChange}
+                  value={confirmPassword}
+                  className='p-3 my-2 bg-gray-700 rounded-lg'
+                  type='password'
+                  placeholder='Confirm Password'
+                  autoComplete='current-password'
+                />
+                <button className='bg-red-600/80 py-3 my-6 rounded-lg border border-red-600/90 hover:border-white hover:bg-white/75 hover:text-red-600 font-bold'>
                   Sign Up
                 </button>
                 <div className='flex items-center justify-between text-sm text-gray-400'>
                   <p>
-                    <input className='mr-2' type='checkbox' />
+                    <input className='mr-2 cursor-pointer' type='checkbox' />
                     Remember me
                   </p>
-                  <p>Need Help?</p>
+                  <p className='cursor-pointer'>Need Help?</p>
                 </div>
                 <p className='py-8'>
                   <span className='text-gray-400'>
                     Already subscribed to FilmPool?
                   </span>{' '}
-                  <Link to='/login'>Sign In</Link>
+                  <Link
+                    to='/login'
+                    className='font-bold hover:text-red-600 hover:underline'
+                  >
+                    Sign In
+                  </Link>
                 </p>
               </form>
             </div>

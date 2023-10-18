@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
 
@@ -17,10 +17,23 @@ const Login = () => {
       await logIn(email, password);
       navigate('/');
     } catch (error) {
-      console.log(error);
       setError(error.message);
+      console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      const timeout = setTimeout(() => {
+        setError('');
+      }, 3000); // 3000 milliseconds = 3 seconds
+
+      // Clear the timeout if the component unmounts
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [error]);
 
   return (
     <>
@@ -35,7 +48,11 @@ const Login = () => {
           <div className='max-w-[450px] h-[600px] mx-auto bg-black/75 text-white'>
             <div className='max-w-[320px] mx-auto py-16'>
               <h1 className='text-3xl font-bold'>Sign In</h1>
-              {error ? <p className='p-3 mt-4 bg-red-400/80'>Wrong credentials, please try again!</p> : null}
+              {error ? (
+                <p className='p-3 mt-4 bg-red-400/80'>
+                  Wrong credentials, please try again!
+                </p>
+              ) : null}
               <form
                 onSubmit={handleSubmit}
                 className='w-full flex flex-col py-4'
@@ -54,7 +71,7 @@ const Login = () => {
                   placeholder='Password'
                   autoComplete='current-password'
                 />
-                <button className='bg-red-600/80 py-3 my-6 rounded-lg font-bold'>
+                <button className='bg-red-600/80 py-3 my-6 rounded-lg border border-red-600/90 hover:border-white hover:bg-white/75 hover:text-red-600 font-bold'>
                   Sign In
                 </button>
                 <div className='flex justify-between items-center text-sm text-gray-400'>
@@ -64,9 +81,16 @@ const Login = () => {
                   </p>
                   <p>Need Help?</p>
                 </div>
-                <p className='py-8'>
-                  <span className='text-gray-400'>New to FilmPool?</span>{' '}
-                  <Link to='/signup'>Sign Up</Link>
+                <p className='my-8'>
+                  <span className='text-gray-400'>
+                    Don&apos;t have an account?
+                  </span>{' '}
+                  <Link
+                    to='/signup'
+                    className='font-bold hover:text-red-600 hover:underline'
+                  >
+                    Sign Up
+                  </Link>
                 </p>
               </form>
             </div>
